@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1090761232953",
+    "project_id": "jutenotifications",
+    "storage_bucket": "jutenotifications.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1090761232953:android:aac1430b75a47c7346f3e8",
+        "android_client_info": {
+          "package_name": "com.example.juteapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZMz0tZhXzNJTRgOUZxRMYbjbx04e7h8A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
