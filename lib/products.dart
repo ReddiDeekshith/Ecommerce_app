@@ -13,7 +13,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<void> fetchProducts() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.242.91:8000/products'),
+        Uri.parse('https://backend-8d89.onrender.com/products'),
       );
       if (response.statusCode == 200) {
         setState(() {
@@ -35,7 +35,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   ) async {
     try {
       final response = await http.put(
-        Uri.parse('http://192.168.242.91:8000/edit-product/$id'),
+        Uri.parse('https://backend-8d89.onrender.com/edit-product/$id'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'ProductName': name,
@@ -56,10 +56,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<void> deleteProduct(String id) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://192.168.242.91:8000/delete-product/$id'),
+        Uri.parse('https://backend-8d89.onrender.com/delete-product/$id'),
       );
       if (response.statusCode == 200) {
-        Navigator.of(context).pop();
         fetchProducts();
       } else {
         throw Exception('Failed to delete product');
@@ -100,8 +99,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.edit, color: Color(0xFF2E7D32)),
                           SizedBox(width: 8),
                           Text(
                             'Edit Product',
@@ -308,14 +307,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                   product['ProductName'],
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                SizedBox(height: 4),
-                                Text(
-                                  product['ProductDescription'],
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
+
                                 SizedBox(height: 4),
                                 Text(
                                   "₹${product['Price']}",

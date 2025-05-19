@@ -46,7 +46,7 @@ class _UploadProductState extends State<UploadProduct> {
         print("hello");
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse("http://192.168.242.91:8000/upload"),
+          Uri.parse("https://backend-8d89.onrender.com/upload"),
         );
         request.files.add(
           await http.MultipartFile.fromPath("file", image.path),
@@ -65,50 +65,62 @@ class _UploadProductState extends State<UploadProduct> {
     }
   }
 
-  Future<void> _submitProduct() async {
-    if (_isLoading) return; // Prevent multiple submissions
-    setState(() {
-      _isLoading = true; // Start loading
-    });
+ Future<void> _submitProduct() async {
+  if (_isLoading) return; // Prevent multiple submissions
+  setState(() {
+    _isLoading = true; // Start loading
+    _uploadedImageUrls.clear(); // ✅ Clear old uploaded URLs
+  });
 
-    try {
-      if (_uploadedImageUrls.isEmpty) {
-        await _uploadImages();
-      }
-
-      final productData = {
-        "ProductName": _nameController.text,
-        "ProductDescription": _descriptionController.text,
-        "Price": _priceController.text,
-        "Size": "${_heightController.text} x ${_widthController.text} cm",
-        "Image": _uploadedImageUrls,
-      };
-
-      final response = await http.post(
-        Uri.parse("http://192.168.242.91:8000/add-product"),
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(productData),
-      );
-
-      if (response.statusCode == 201) {
-        print("Product added successfully!");
-      } else {
-        print("Failed to add product.");
-      }
-      _nameController.text = "";
-      _descriptionController.text = "";
-      _priceController.text = "";
-      _heightController.text = "";
-      _widthController.text = "";
-      _images.clear();
-    } catch (e) {
-      print("Error: $e");
-    } finally {
+  try {
+    if (_images.isEmpty) {
+      print("Please add at least one image.");
       setState(() {
-        _isLoading = false; // Stop loading
+        _isLoading = false;
       });
+      return;
     }
+
+    await _uploadImages(); // This will fill _uploadedImageUrls
+
+    final productData = {
+      "ProductName": _nameController.text,
+      "ProductDescription": _descriptionController.text,
+      "Price": _priceController.text,
+      "Size": "${_heightController.text} x ${_widthController.text} cm",
+      "Image": _uploadedImageUrls,
+    };
+
+    final response = await http.post(
+      Uri.parse("https://backend-8d89.onrender.com/add-product"),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(productData),
+    );
+
+    if (response.statusCode == 201) {
+      print("Product added successfully!");
+      // ✅ Clear everything after successful submission
+      setState(() {
+        _nameController.clear();
+        _descriptionController.clear();
+        _priceController.clear();
+        _heightController.clear();
+        _widthController.clear();
+        _images.clear();
+        _uploadedImageUrls.clear(); // Clear URLs here as well
+      });
+    } else {
+      print("Failed to add product.");
+    }
+  } catch (e) {
+    print("Error: $e");
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

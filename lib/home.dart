@@ -43,39 +43,40 @@ class _MyHomeState extends State<MyHome> {
         ),
         actions: [
           Builder(
-            builder: (context) => Stack(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Scaffold.of(context).openEndDrawer();
-                    setState(() {
-                      provider.markAllAsRead();
-                    });
-                  },
-                  icon: Icon(Icons.notifications, color: Colors.white),
-                ),
-                if (provider.badgeCount > 0)
-                  Positioned(
-                    right: 6,
-                    top: 6,
-                    child: Container(
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        provider.badgeCount.toString(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+            builder:
+                (context) => Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                        setState(() {
+                          provider.markAllAsRead();
+                        });
+                      },
+                      icon: Icon(Icons.notifications, color: Colors.white),
+                    ),
+                    if (provider.badgeCount > 0)
+                      Positioned(
+                        right: 6,
+                        top: 6,
+                        child: Container(
+                          padding: EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            provider.badgeCount.toString(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-              ],
-            ),
+                  ],
+                ),
           ),
           SizedBox(width: 10),
         ],
@@ -86,90 +87,143 @@ class _MyHomeState extends State<MyHome> {
         duration: Duration(milliseconds: 200),
         child: _pages[_selectedIndex],
       ),
-     endDrawer: Drawer(
-  child: Container(
-    color: Colors.white,
-    child: Column(
-      children: [
-        Container(
-          width: double.infinity,
-          color: Color(0xFF2E7D32), // Green header
-          padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top + 20,
-            left: 16,
-            right: 16,
-            bottom: 40,
-          ),
-          child: Center(
-            child: Text(
-              'Notifications',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: provider.notifications.isEmpty
-              ? Center(
-                  child: Text(
-                    'No notifications yet.',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                )
-              : ListView.separated(
-                  itemCount: provider.notifications.length,
-                  separatorBuilder: (_, __) => Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final notification = provider.notifications[index];
-                    return ListTile(
-                      leading: Icon(
-                        Icons.notifications,
-                        color: notification.isNew ? Colors.green : Colors.grey,
-                      ),
-                      title: Text(
-                        notification.title,
-                        style: TextStyle(
-                          fontWeight: notification.isNew
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(notification.message),
-                          SizedBox(height: 4),
-                          Text(
-                            _getRelativeTime(notification.timestamp),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 16,
-                      ),
-                      tileColor: notification.isNew
-                          ? Colors.green[50]
-                          : Colors.transparent,
-                    );
-                  },
+      endDrawer: Drawer(
+        child: Container(
+          color: Colors.grey[100],
+          child: Column(
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                color: Color(0xFF2E7D32),
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top + 16,
+                  left: 16,
+                  right: 16,
+                  bottom: 20,
                 ),
+                child: const Center(
+                  child: Text(
+                    'Notifications',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+
+              // Clear All Button
+              if (provider.notifications.isNotEmpty)
+                Container(
+                  width: double.infinity,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: TextButton.icon(
+                    onPressed: () {
+                      provider.clearNotifications();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('All notifications cleared'),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.delete_sweep, color: Colors.red),
+                    label: const Text(
+                      'Clear All',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                  ),
+                ),
+
+              // Notifications List
+              Expanded(
+                child:
+                    provider.notifications.isEmpty
+                        ? const Center(
+                          child: Text(
+                            'No notifications yet.',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                        )
+                        : ListView.builder(
+                          padding: const EdgeInsets.all(10),
+                          itemCount: provider.notifications.length,
+                          itemBuilder: (context, index) {
+                            final notification = provider.notifications[index];
+                            return Card(
+                              elevation: 2,
+                              margin: const EdgeInsets.symmetric(vertical: 5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              color:
+                                  notification.isNew
+                                      ? Colors.green[50]
+                                      : Colors.white,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor:
+                                      notification.isNew
+                                          ? Color(0xFF2E7D32)
+                                          : Colors.grey[400],
+                                  child: const Icon(
+                                    Icons.notifications,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                title: Text(
+                                  notification.title,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight:
+                                        notification.isNew
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      notification.message,
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      _getRelativeTime(notification.timestamp),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                contentPadding: const EdgeInsets.all(12),
+                              ),
+                            );
+                          },
+                        ),
+              ),
+            ],
+          ),
         ),
-      ],
-    ),
-  ),
-),
+      ),
 
       bottomNavigationBar: CurvedNavigationBar(
         index: _selectedIndex,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         color: Color(0xFF2E7D32),
         buttonBackgroundColor: Colors.white,
         height: 70,
@@ -215,13 +269,13 @@ class _MyHomeState extends State<MyHome> {
         ),
         _selectedIndex != index
             ? Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              )
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            )
             : SizedBox(),
       ],
     );
@@ -229,9 +283,6 @@ class _MyHomeState extends State<MyHome> {
 }
 
 // Dummy pages
-
-
-
 
 class SpecialOrdersPage extends StatelessWidget {
   @override

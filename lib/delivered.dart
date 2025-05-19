@@ -14,7 +14,7 @@ class _DeliveredPageState extends State<DeliveredPage> {
   List<dynamic> deliveredOrders = [];
   bool _isLoading = true;
   final String baseUrl =
-      'http://192.168.242.91:8000'; // Update with your backend IP
+      'https://backend-8d89.onrender.com'; // Update with your backend IP
 
   @override
   void initState() {

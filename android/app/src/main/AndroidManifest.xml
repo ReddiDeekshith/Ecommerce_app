@@ -2,7 +2,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
-        android:label="juteapp"
+        android:label="Udaya Teja"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

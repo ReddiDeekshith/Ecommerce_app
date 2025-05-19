@@ -59,13 +59,15 @@ class NotificationProvider with ChangeNotifier {
   Future<void> fetchNotifications() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.242.91:8000/get-notifications'),
+        Uri.parse('https://backend-8d89.onrender.com/get-notifications'),
       );
 
       if (response.statusCode == 200) {
         List<dynamic> responseData = json.decode(response.body);
         List<NotificationModel> fetchedNotifications =
-            responseData.map((notif) => NotificationModel.fromJson(notif)).toList();
+            responseData
+                .map((notif) => NotificationModel.fromJson(notif))
+                .toList();
 
         int newNotificationsCount = 0;
 
@@ -108,7 +110,6 @@ class NotificationProvider with ChangeNotifier {
     );
 
     _notifications.insert(0, newNotif);
-    
 
     if (_notifications.length > 10) {
       _notifications.removeLast();
@@ -155,11 +156,27 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void clearNotifications() {
+  Future<void> clearNotifications() async {
     _notifications.clear();
     _badgeCount = 0;
-    _saveNotifications();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('notifications');
+
     notifyListeners();
+
+    // 🔁 Clear from backend
+    try {
+      final response = await http.get(
+        Uri.parse('https://backend-8d89.onrender.com/clear'),
+      );
+
+      if (response.statusCode != 200) {
+        print('Failed to clear notifications on the backend.');
+      }
+    } catch (e) {
+      print('Error clearing notifications from backend: $e');
+    }
   }
 
   @override

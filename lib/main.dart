@@ -34,9 +34,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  
   String? _fcmToken = "Fetching token...";
-  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
   bool _showNotification = false;
   String _notificationMessage = "";
 
@@ -77,7 +77,10 @@ class _MyAppState extends State<MyApp> {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         print("📥 Foreground message: ${message.notification?.title}");
         // Show custom notification overlay
-        showNotificationOverlay(message.notification?.title ?? 'New Notification',message.notification!.body??'Hello');
+        showNotificationOverlay(
+          message.notification?.title ?? 'New Notification',
+          message.notification!.body ?? 'Hello',
+        );
       });
 
       // When the notification is tapped and the app opens
@@ -95,7 +98,9 @@ class _MyAppState extends State<MyApp> {
     if (token != null) {
       try {
         final response = await http.post(
-          Uri.parse('http://localhost:8000/saveToken'),  // Replace with your backend URL
+          Uri.parse(
+            'http://localhost:8000/saveToken',
+          ), // Replace with your backend URL
           body: {'fcm_token': token},
         );
         if (response.statusCode == 200) {
@@ -112,7 +117,7 @@ class _MyAppState extends State<MyApp> {
   // Show custom notification overlay when a message is received in the foreground
   void showNotificationOverlay(String title, String message) {
     final provider = Provider.of<NotificationProvider>(context, listen: false);
-    provider.addNotification(title,message); // Add notification to provider
+    provider.addNotification(title, message); // Add notification to provider
 
     setState(() {
       _notificationMessage = message;
@@ -130,8 +135,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      color: Colors.white,
       debugShowCheckedModeBanner: false,
-      scaffoldMessengerKey: _scaffoldMessengerKey, // Use the scaffoldMessengerKey
+      scaffoldMessengerKey:
+          _scaffoldMessengerKey, // Use the scaffoldMessengerKey
       home: Stack(
         children: [
           // Your background or content
@@ -139,7 +146,7 @@ class _MyAppState extends State<MyApp> {
           Positioned.fill(
             child: Opacity(
               opacity: 0.15,
-              child: Align( 
+              child: Align(
                 alignment: Alignment.center,
                 child: Image.asset("assets/logo.png", fit: BoxFit.contain),
               ),
@@ -152,4 +159,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
